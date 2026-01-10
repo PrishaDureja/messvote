@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Choose Login — Mess Vote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="overlay">
+    <div class="login-choice-card">
+      <h1 class="main-heading">Login to {{ mess }} Mess</h1>
+      <p class="sub-heading">Select your role</p>
+
+      <div class="choice-buttons">
+        <a href="{{ url_for('login', mess=mess|lower|replace(' ', '')) }}" class="btn">Student Login</a>
+        <a href="{{ url_for('admin_login', mess=mess|lower|replace(' ', '')) }}" class="btn">Admin Login</a>
+
+      </div>
+
+      <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
+    </div>
+  </div>
+</body>
+</html>

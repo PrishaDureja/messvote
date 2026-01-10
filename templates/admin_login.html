@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login | Mess Vote</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+
+<body class="login-page">
+  <div class="overlay">
+    <div class="login-card">
+      <h1 class="main-heading">Welcome Back Admin</h1>
+      <h2 class="sub-heading">Login to Manage Menus & Feedback</h2>
+
+      <form method="POST">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Enter username" required>
+
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter password" required>
+
+        <button type="submit" class="btn">Continue</button>
+      </form>
+
+      <a href="{{ url_for('index') }}" class="back-btn">← Back to Home</a>
+    </div>
+  </div>
+</body>
+</html>

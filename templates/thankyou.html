@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thank You | Mess Vote</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+
+    /* Background */
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url("/static/images/bg_home.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      font-family: 'Poppins', sans-serif;
+      color: var(--main-heading);
+    }
+
+    .overlay {
+      width: 100%;
+      height: 100vh;
+      background-color: rgba(255, 255, 255, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .thankyou-card {
+      background-color: var(--card-bg);
+      border-radius: 25px;
+      padding: 60px 80px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      max-width: 500px;
+    }
+
+    .thankyou-card h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--main-heading);
+      font-family: 'Rambla', 'Poppins', sans-serif;
+      margin: 15px 0;
+    }
+
+    .thankyou-card p {
+      color: var(--text);
+      font-size: 1rem;
+      margin-bottom: 25px;
+    }
+
+    .emoji {
+      font-size: 3rem;
+    }
+
+    .btn {
+      background-color: var(--btn-color);
+      color: var(--main-heading);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 25px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      margin: 5px;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .logout-btn {
+      background-color: #ccc;
+      color: var(--black);
+      text-decoration: none;
+      padding: 10px 25px;
+      border-radius: 10px;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .logout-btn:hover {
+      background-color: #bbb;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="thankyou-card">
+      <h1>Thank You!</h1>
+      <p>Your feedback helps us make the mess food better every day!</p>
+      <a href="{{ url_for('choose_meal') }}" class="btn">Give Another Feedback</a><br>
+      <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+  </div>
+</body>
+</html>

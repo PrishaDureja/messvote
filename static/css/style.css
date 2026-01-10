@@ -1,0 +1,403 @@
+/* =====================================
+   MessVote — GlassGlow Final Theme (Updated Logic)
+   ===================================== */
+
+/* --- Core Variables --- */
+:root {
+  --bg-blur: rgba(255, 255, 255, 0.2);
+  --card-bg: rgba(255, 255, 255, 0.3);
+  --text: #1a1a1a;
+  --main-heading: #1e2d45;
+  --sub-heading: #3d4e63;
+  --btn-color: #a2d2ff;
+  --accent: #fbc4ab;
+  --shadow: rgba(0, 0, 0, 0.15);
+}
+
+/* --- Base Layout --- */
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background-image: url("../images/bg_home.png");
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* --- Overlay --- */
+.overlay {
+  backdrop-filter: blur(3px);
+  background-color: rgba(255, 255, 255, 0.05);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Navbar --- */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 70px;
+  z-index: 100;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.navbar .logo {
+  font-weight: 700;
+  font-size: 1.7rem;
+  color: #0f1b2d;
+  letter-spacing: 0.5px;
+}
+
+.navbar a {
+  color: #0f1b2d;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 28px;
+  transition: 0.3s ease;
+  font-size: 1rem;
+}
+
+.navbar a:hover {
+  color: var(--btn-color);
+  text-shadow: 0 0 10px rgba(162, 210, 255, 0.8);
+}
+
+/* --- Card Containers --- */
+.choose-card,
+.login-card,
+.admin-card,
+.login-choice-card {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(16px);
+  border-radius: 26px;
+  padding: 50px 55px;
+  width: 500px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeInUp 0.6s ease forwards;
+  text-align: center;
+  margin-top: 90px;
+}
+
+.choose-card:hover,
+.login-card:hover,
+.admin-card:hover,
+.login-choice-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 50px rgba(162, 210, 255, 0.5);
+}
+
+/* --- Headings --- */
+.main-heading {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--main-heading);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.sub-heading {
+  color: rgba(26, 43, 68, 0.9);
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 25px;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+}
+
+/* --- Input Fields --- */
+input[type="text"],
+input[type="number"],
+input[type="password"],
+textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font-size: 1.05rem;
+  margin-top: 6px;
+  margin-bottom: 25px;
+  outline: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--btn-color);
+  box-shadow: 0 0 8px rgba(162, 210, 255, 0.6);
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: rgba(60, 60, 60, 0.6);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* --- Buttons --- */
+.btn,
+button {
+  background: #ffffff;
+  border: none;
+  color: #1a1a1a;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 1.05rem;
+  display: inline-block;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(162, 210, 255, 0.6);
+  margin-top: 12px;
+}
+
+.btn:hover,
+button:hover {
+  background: #eaf6ff;
+  box-shadow: 0 0 25px rgba(162, 210, 255, 0.8);
+  transform: translateY(-3px);
+}
+
+/* --- Logout Button --- */
+.logout-btn {
+  background: #f1f1f1;
+  color: #333;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #e2e2e2;
+  transform: translateY(-2px);
+}
+
+/* --- Mess Selection Logos --- */
+.mess-options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+  margin-top: 35px;
+}
+
+.mess-logo {
+  width: 200px;
+  height: 200px;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 35px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  object-fit: contain;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mess-logo:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 12px 45px rgba(162, 210, 255, 0.8);
+}
+
+/* --- Choose Login Card --- */
+.login-choice-card {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: 50px 60px;
+  text-align: center;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.15);
+}
+
+.choice-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 25px;
+}
+
+/* --- Back Link --- */
+.back-link {
+  display: inline-block;
+  margin-top: 25px;
+  color: var(--main-heading);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.back-link:hover {
+  color: var(--btn-color);
+  text-shadow: 0 0 6px rgba(162, 210, 255, 0.6);
+}
+
+/* --- Home Page Login Buttons --- */
+.login-options {
+  position: absolute;
+  top: 20px;
+  right: 50px;
+  display: flex;
+  gap: 18px;
+}
+
+.login-option {
+  color: #1e2d45;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.login-option:hover {
+  background: #a2d2ff;
+  color: #0a1b2c;
+  box-shadow: 0 0 20px rgba(162, 210, 255, 0.7);
+  transform: translateY(-2px);
+}
+
+/* --- Table Styling --- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+th,
+td {
+  padding: 14px 20px;
+  text-align: left;
+  font-size: 1.05rem;
+}
+
+thead {
+  background: rgba(162, 210, 255, 0.35);
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* --- Animations --- */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Responsive Fixes --- */
+@media (max-width: 600px) {
+  .choose-card,
+  .login-card,
+  .admin-card,
+  .login-choice-card {
+    width: 90%;
+    padding: 35px;
+  }
+
+  .navbar {
+    padding: 10px 30px;
+  }
+
+  .navbar .logo {
+    font-size: 1.4rem;
+  }
+
+  .meal-btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+
+  .mess-logo {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+/* --- Choose Meal Page Redesign --- */
+.meal-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.meal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  padding: 16px 32px;
+  border-radius: 16px;
+  color: #1e2d45;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(162, 210, 255, 0.6);
+  transition: all 0.3s ease;
+  gap: 10px;
+}
+
+.meal-btn i {
+  font-size: 1.3rem;
+  color: #1a2d44;
+}
+
+.meal-btn:hover {
+  background: #eaf6ff;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(162, 210, 255, 0.8);
+}
+
+/* --- Logout Button Styling (Redesign) --- */
+.logout-btn {
+  background: rgba(255, 255, 255, 0.85);
+  color: #333;
+  font-weight: 700;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 12px;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  margin-top: 45px; /* adds spacing below meal buttons */
+  box-shadow: 0 0 15px rgba(162, 210, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #e2f1ff;
+  transform: translateY(-3px);
+  box-shadow: 0 0 25px rgba(162, 210, 255, 0.6);
+}
