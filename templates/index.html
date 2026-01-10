@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mess Vote — Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="home-page">
+  <div class="overlay">
+    <div class="choose-card">
+      <h1 class="main-heading">Mess Vote</h1>
+      <p class="sub-heading">Choose your mess to continue</p>
+
+      <div class="mess-options">
+        <a href="{{ url_for('choose_login', mess='Indya') }}">
+          <img src="{{ url_for('static', filename='images/quess_icon.png') }}" alt="Indya Mess" class="mess-logo">
+        </a>
+        <a href="{{ url_for('choose_login', mess='BlueDove') }}">
+          <img src="{{ url_for('static', filename='images/blue_dove_icon.png') }}" alt="BlueDove Mess" class="mess-logo">
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

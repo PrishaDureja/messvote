@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ mess }} — {{ meal_type }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+
+<body class="choose-page">
+  {% include '_navbar.html' %}
+  <div class="overlay">
+    <div class="choose-card">
+      <h1 class="main-heading">{{ mess }} — {{ meal_type }}</h1>
+
+      {% if items %}
+        <form method="POST">
+          {% for item in items %}
+            <div style="margin-bottom: 25px;">
+              <label style="font-weight: 600; color: var(--sub-heading);">{{ item.item_name }}</label><br>
+              <select name="rating_{{ item.id }}" class="rating" required style="border-radius:10px; padding:8px;">
+                <option value="">Rate</option>
+                <option value="1">⭐</option>
+                <option value="2">⭐⭐</option>
+                <option value="3">⭐⭐⭐</option>
+                <option value="4">⭐⭐⭐⭐</option>
+                <option value="5">⭐⭐⭐⭐⭐</option>
+              </select>
+              <br>
+              <textarea name="feedback_{{ item.id }}" placeholder="Leave feedback..." style="margin-top:10px; width:90%; border-radius:10px; border:none; background:var(--input-bg); padding:10px;"></textarea>
+            </div>
+          {% endfor %}
+          <div style="margin-top:30px;">
+            <label style="font-weight:600; color:var(--sub-heading);">Suggest a new dish:</label><br>
+            <input type="text" name="suggestion_text" placeholder="e.g., Paneer Butter Masala" style="background:var(--input-bg); border:none; border-radius:20px; padding:10px; width:90%; margin-top:8px;">
+          </div>
+          <br>
+          <button type="submit" class="btn">Submit Feedback</button>
+        </form>
+      {% else %}
+        <p style="color: var(--text);">Menu for {{ meal_type }} not uploaded yet.</p>
+      {% endif %}
+      <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+  </div>
+</body>
+</html>

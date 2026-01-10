@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ mess }} — Choose Meal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://kit.fontawesome.com/a2e0e6f4a4.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="overlay">
+    <div class="choose-card">
+      <h1 class="main-heading">{{ mess }} Mess</h1>
+      <p class="sub-heading">Select a meal to rate today</p>
+
+      <div class="meal-buttons">
+  <a href="{{ url_for('menu', meal_type='breakfast') }}" class="meal-btn">
+    <i class="fa-solid fa-mug-hot"></i> Breakfast
+  </a>
+  <a href="{{ url_for('menu', meal_type='lunch') }}" class="meal-btn">
+    <i class="fa-solid fa-utensils"></i> Lunch
+  </a>
+  <a href="{{ url_for('menu', meal_type='dinner') }}" class="meal-btn">
+    <i class="fa-solid fa-moon"></i> Dinner
+  </a>
+</div>
+
+
+      <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin — Upload Menu | Mess Vote</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="login-page">
+  {% include '_navbar.html' %}
+  
+  <div class="overlay">
+    <div class="choose-card" style="width: 800px;">
+      <h1 class="main-heading">🍽 Upload Today's Menu</h1>
+      <h2 class="sub-heading">Manage meals and suggestions</h2>
+
+      <!-- ✅ Fixed: Proper route + POST -->
+      <form 
+        method="POST" 
+        action="{{ url_for('admin_menus', mess=request.args.get('mess') or selected_mess) }}" 
+        style="margin-bottom: 25px;"
+      >
+        <!-- Dropdown Row -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 20px;">
+          <div>
+            <label>Select Mess:</label><br>
+            <select 
+              name="mess" 
+              style="padding: 10px; border-radius: 10px; background: var(--input-bg); border: none;"
+            >
+              <option value="Blue Dove" {% if selected_mess == 'Blue Dove' %}selected{% endif %}>Blue Dove</option>
+              <option value="Quess" {% if selected_mess == 'Quess' %}selected{% endif %}>Quess</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Select Meal:</label><br>
+            <select 
+              name="meal_type" 
+              style="padding: 10px; border-radius: 10px; background: var(--input-bg); border: none;"
+            >
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Menu Inputs -->
+        <label>Enter Menu Items:</label>
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 8px;">
+          <input 
+            type="text" 
+            name="meal1" 
+            placeholder="Meal 1 e.g. Aloo Paratha" 
+            style="background: var(--input-bg); border: none; padding: 10px; border-radius: 10px; width: 30%;"
+          >
+          <input 
+            type="text" 
+            name="meal2" 
+            placeholder="Meal 2 e.g. Curd" 
+            style="background: var(--input-bg); border: none; padding: 10px; border-radius: 10px; width: 30%;"
+          >
+          <input 
+            type="text" 
+            name="meal3" 
+            placeholder="Meal 3 e.g. Tea" 
+            style="background: var(--input-bg); border: none; padding: 10px; border-radius: 10px; width: 30%;"
+          >
+        </div>
+
+        <!-- Upload Button -->
+        <button type="submit" class="btn" style="margin-top: 25px;">Upload Menu</button>
+      </form>
+
+      <!-- Uploaded Menus -->
+      <h2 class="sub-heading">📋 Today's Uploaded Menus</h2>
+      {% if menus %}
+        <table 
+          style="width: 100%; border-collapse: collapse; margin-top: 15px; 
+                 box-shadow: var(--shadow); border-radius: 10px; overflow: hidden;"
+        >
+          <thead>
+            <tr style="background-color: var(--btn-color); color: var(--main-heading); text-align: left;">
+              <th style="padding: 12px;">Mess</th>
+              <th style="padding: 12px;">Meal</th>
+              <th style="padding: 12px;">Item</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in menus %}
+              <tr style="background-color: var(--card-bg); border-bottom: 1px solid #eee;">
+                <td style="padding: 10px;">{{ m.mess }}</td>
+                <td style="padding: 10px;">{{ m.meal_type }}</td>
+                <td style="padding: 10px;">{{ m.item_name }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p style="color: var(--text); margin-top: 10px;">No menus uploaded yet for today.</p>
+      {% endif %}
+
+      <!-- Bottom Buttons -->
+      <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px;">
+        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap;">
+          <a href="{{ url_for('admin_dashboard') }}" class="btn">📊 View Dashboard</a>
+          <a href="{{ url_for('admin_suggestions') }}" class="btn">💡 View Suggestions</a>
+          <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
