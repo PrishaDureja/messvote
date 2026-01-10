@@ -1,0 +1,18 @@
+# macOS system files
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+global_env/
+venv/
+env/
+
+# Database files (local)
+instance/
+*.db
+
+# IDE settings
+.vscode/
