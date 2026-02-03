@@ -14,8 +14,8 @@
       <p class="sub-heading">Select your role</p>
 
       <div class="choice-buttons">
-        <a href="{{ url_for('login', mess=mess|lower|replace(' ', '')) }}" class="btn">Student Login</a>
-        <a href="{{ url_for('admin_login', mess=mess|lower|replace(' ', '')) }}" class="btn">Admin Login</a>
+        <a href="{{ url_for('login', mess=mess) }}" class="btn">Student Login</a>
+        <a href="{{ url_for('admin_login', mess=mess) }}" class="btn">Admin Login</a>
 
       </div>
 
