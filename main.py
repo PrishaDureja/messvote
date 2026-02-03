@@ -1,10 +1,23 @@
 import os
-from datetime import datetime, date, timedelta
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
-from flask_sqlalchemy import SQLAlchemy
 import csv
 import io
+from datetime import datetime, date, timedelta
+
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    flash,
+    send_file,
+)
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
+
+from ml.services.predictor import predict_aspect
+
 
 # -------------------------
 # Basic Setup
@@ -14,10 +27,12 @@ DB_PATH = os.path.join(BASE_DIR, "instance", "database.db")
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
+
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
 
 # -------------------------
 # Database Models
@@ -63,9 +78,9 @@ class Suggestion(db.Model):
 def today():
     return date.today()
 
-# ✅ FIXED: Case & space-insensitive mess matching
+
+# Case & space-insensitive mess matching
 def get_menu_for(mess, meal_type):
-    """Return today’s menu items for a given mess and meal (normalized and case-insensitive)."""
     normalized_mess = mess.replace(" ", "").lower()
 
     return (
@@ -73,7 +88,7 @@ def get_menu_for(mess, meal_type):
         .filter(
             func.replace(func.lower(MenuItem.mess), " ", "") == normalized_mess,
             func.lower(MenuItem.meal_type) == meal_type.lower(),
-            MenuItem.date == today()
+            MenuItem.date == today(),
         )
         .order_by(MenuItem.position)
         .all()
@@ -119,19 +134,24 @@ def select_mess():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     mess = request.args.get("mess") or request.form.get("mess")
+
     if request.method == "POST":
         reg_no = request.form["reg_no"].strip()
+
         if not reg_no:
             flash("Enter your registration number!", "error")
             return redirect(request.url)
+
         user = User.query.filter_by(reg_no=reg_no).first()
         if not user:
             user = User(reg_no=reg_no)
             db.session.add(user)
             db.session.commit()
+
         session["reg_no"] = reg_no
-        session["mess"] = mess
+        session["mess"] = mess.replace(" ", "").lower()
         return redirect(url_for("choose_meal"))
+
     return render_template("login.html", mess=mess)
 
 
@@ -139,16 +159,24 @@ def login():
 def choose_meal():
     if "reg_no" not in session:
         return redirect(url_for("index"))
-    return render_template("choose_meal.html", mess=session.get("mess"))
+
+    normalized_mess = session.get("mess")
+    display_mess = "Blue Dove" if normalized_mess == "bluedove" else "Quess"
+
+    return render_template("choose_meal.html", mess=display_mess)
 
 
 @app.route("/menu/<meal_type>", methods=["GET", "POST"])
 def menu(meal_type):
     if "reg_no" not in session:
         return redirect(url_for("index"))
+    
+    print("DEBUG SESSION MESS =", session.get("mess"))
+    print("DEBUG MEAL TYPE =", meal_type)
 
-    mess = session.get("mess")
-    items = get_menu_for(mess, meal_type)
+    normalized_mess = session.get("mess")
+    display_mess = "Blue Dove" if normalized_mess == "bluedove" else "Quess"
+    items = get_menu_for(normalized_mess, meal_type)
 
     if request.method == "POST":
         reg_no = session["reg_no"]
@@ -157,12 +185,15 @@ def menu(meal_type):
             if key.startswith("rating_"):
                 item_id = int(key.split("_", 1)[1])
                 rating = int(request.form.get(key))
-                feedback_text = request.form.get(f"feedback_{item_id}", "").strip()
+                feedback_text = request.form.get(
+                    f"feedback_{item_id}", ""
+                ).strip()
+
                 item = MenuItem.query.get(item_id)
                 if item:
                     vote = Vote(
                         reg_no=reg_no,
-                        mess=mess,
+                        mess=normalized_mess,
                         meal_type=meal_type,
                         item_name=item.item_name,
                         rating=rating,
@@ -170,19 +201,30 @@ def menu(meal_type):
                     )
                     db.session.add(vote)
 
+                    predicted = predict_aspect(feedback_text)
+                    vote.predicted_aspect = predicted
+
         suggestion_text = request.form.get("suggestion_text", "").strip()
         if suggestion_text:
-            suggestion = Suggestion(reg_no=reg_no, mess=mess, text=suggestion_text)
+            suggestion = Suggestion(
+                reg_no=reg_no,
+                mess=normalized_mess,
+                text=suggestion_text,
+            )
             db.session.add(suggestion)
 
         db.session.commit()
         return redirect(url_for("thankyou"))
 
-    print("MESS:", mess)
     print("MEAL TYPE:", meal_type)
     print("MENU ITEMS FOUND:", [i.item_name for i in items])
 
-    return render_template("menu.html", mess=mess, meal_type=meal_type, items=items)
+    return render_template(
+        "menu.html",
+        mess=display_mess,
+        meal_type=meal_type,
+        items=items,
+    )
 
 
 @app.route("/thankyou")
@@ -210,6 +252,7 @@ def admin_login():
             return redirect(url_for("admin_menus"))
         else:
             flash("Invalid credentials", "error")
+
     return render_template("admin_login.html")
 
 
@@ -230,87 +273,106 @@ def admin_required(f):
 def admin_menus():
     if request.method == "POST":
         mess = request.form.get("mess", "").strip()
-        normalized_mess = mess.replace(" ", "").lower()   # ✅ Normalize for storage
+        normalized_mess = mess.replace(" ", "").lower()
         meal_type = request.form.get("meal_type", "").strip().lower()
 
         if not mess or not meal_type:
             flash("Please select mess and meal type.", "error")
             return redirect(url_for("admin_menus"))
 
-        # ✅ Delete existing menu for SAME mess + meal + date
         MenuItem.query.filter(
             MenuItem.mess == normalized_mess,
             func.lower(MenuItem.meal_type) == meal_type,
-            MenuItem.date == today()
+            MenuItem.date == today(),
         ).delete()
 
-        # ✅ Insert new menu items
         for pos in (1, 2, 3):
             name = request.form.get(f"meal{pos}", "").strip()
             if name:
                 mi = MenuItem(
                     date=today(),
-                    mess=normalized_mess,               # ⭐ stored normalized
-                    meal_type=meal_type,               # ⭐ also normalized
+                    mess=normalized_mess,
+                    meal_type=meal_type,
                     position=pos,
                     item_name=name.strip(),
                 )
                 db.session.add(mi)
 
         db.session.commit()
-        flash(f"{mess} — {meal_type.title()} menu uploaded successfully!", "success")
+        flash(
+            f"{mess} — {meal_type.title()} menu uploaded successfully!",
+            "success",
+        )
         return redirect(url_for("admin_menus", mess=mess))
 
-    # -------- GET REQUEST (Display Existing Menu) --------
     selected_mess = request.args.get("mess", "Blue Dove")
-    normalized_mess = selected_mess.replace(" ", "").lower()   # ⭐ normalize for lookup
+    normalized_mess = selected_mess.replace(" ", "").lower()
 
-    menus = MenuItem.query.filter_by(
-        date=today(),
-        mess=normalized_mess              # ⭐ clean lookup
-    ).order_by(
-        MenuItem.meal_type,
-        MenuItem.position
-    ).all()
+    menus = (
+        MenuItem.query
+        .filter_by(date=today(), mess=normalized_mess)
+        .order_by(MenuItem.meal_type, MenuItem.position)
+        .all()
+    )
 
-    return render_template("admin_menus.html", menus=menus, selected_mess=selected_mess)
+    return render_template(
+        "admin_menus.html",
+        menus=menus,
+        selected_mess=selected_mess,
+    )
+
 
 @app.route("/admin/suggestions")
 @admin_required
 def admin_suggestions():
     suggestions = (
-        db.session.query(Suggestion.text, func.count(Suggestion.id).label("cnt"))
+        db.session.query(
+            Suggestion.text,
+            func.count(Suggestion.id).label("cnt"),
+        )
         .group_by(Suggestion.text)
         .order_by(func.count(Suggestion.id).desc())
         .all()
     )
-    return render_template("suggestions_view.html", suggestions=suggestions)
+
+    return render_template(
+        "suggestions_view.html",
+        suggestions=suggestions,
+    )
 
 
 @app.route("/admin/dashboard")
 @admin_required
 def admin_dashboard():
-    # Calculate average ratings for each meal type
     meal_averages_query = (
-        db.session.query(Vote.meal_type, func.avg(Vote.rating).label("avg_rating"))
+        db.session.query(
+            Vote.meal_type,
+            func.avg(Vote.rating).label("avg_rating"),
+        )
         .group_by(Vote.meal_type)
         .all()
     )
 
-    # Convert SQLAlchemy rows → plain list of tuples
-    meal_averages = [(m.meal_type, round(m.avg_rating, 2)) for m in meal_averages_query]
+    meal_averages = [
+        (m.meal_type, round(m.avg_rating, 2))
+        for m in meal_averages_query
+    ]
 
-    # Calculate average per dish
     dish_averages_query = (
-        db.session.query(Vote.item_name, func.avg(Vote.rating).label("avg_rating"))
+        db.session.query(
+            Vote.item_name,
+            func.avg(Vote.rating).label("avg_rating"),
+        )
         .group_by(Vote.item_name)
         .order_by(func.avg(Vote.rating).desc())
         .all()
     )
 
-    dish_averages = [(d.item_name, round(d.avg_rating, 2)) for d in dish_averages_query]
+    dish_averages = [
+        (d.item_name, round(d.avg_rating, 2))
+        for d in dish_averages_query
+    ]
 
-    # Find star meal (highest-rated dish)
     star_meal = dish_averages[0][0] if dish_averages else None
 
     return render_template(
@@ -321,38 +383,61 @@ def admin_dashboard():
     )
 
 
-
 @app.route("/admin/export")
 @admin_required
 def admin_export():
     si = io.StringIO()
     cw = csv.writer(si)
-    cw.writerow(["reg_no", "mess", "meal_type", "item_name", "rating", "feedback", "date"])
+
+    cw.writerow(
+        [
+            "reg_no",
+            "mess",
+            "meal_type",
+            "item_name",
+            "rating",
+            "feedback",
+            "date",
+        ]
+    )
+
     votes = Vote.query.order_by(Vote.date.desc()).all()
     for v in votes:
-        cw.writerow([
-            v.reg_no,
-            v.mess,
-            v.meal_type,
-            v.item_name,
-            v.rating,
-            v.feedback or "",
-            v.date.isoformat(),
-        ])
+        cw.writerow(
+            [
+                v.reg_no,
+                v.mess,
+                v.meal_type,
+                v.item_name,
+                v.rating,
+                v.feedback or "",
+                v.date.isoformat(),
+            ]
+        )
+
     output = io.BytesIO()
     output.write(si.getvalue().encode())
     output.seek(0)
-    return send_file(output, mimetype="text/csv", download_name="votes_export.csv", as_attachment=True)
+
+    return send_file(
+        output,
+        mimetype="text/csv",
+        download_name="votes_export.csv",
+        as_attachment=True,
+    )
+
 
 @app.route("/choose_login/<mess>")
 def choose_login(mess):
     return render_template("choose_login.html", mess=mess)
+
 
 @app.route("/admin/weekly_report")
 @admin_required
 def weekly_report():
     today_date = date.today()
     week_ago = today_date - timedelta(days=7)
+
     votes = (
         db.session.query(
             Vote.mess,
@@ -369,14 +454,31 @@ def weekly_report():
 
     si = io.StringIO()
     cw = csv.writer(si)
-    cw.writerow(["Mess", "Meal Type", "Item Name", "Average Rating", "Total Votes"])
+    cw.writerow(
+        ["Mess", "Meal Type", "Item Name", "Average Rating", "Total Votes"]
+    )
+
     for v in votes:
-        cw.writerow([v.mess, v.meal_type, v.item_name, round(v.avg_rating, 2), v.total_votes])
+        cw.writerow(
+            [
+                v.mess,
+                v.meal_type,
+                v.item_name,
+                round(v.avg_rating, 2),
+                v.total_votes,
+            ]
+        )
 
     output = io.BytesIO()
     output.write(si.getvalue().encode())
     output.seek(0)
-    return send_file(output, mimetype="text/csv", download_name="weekly_report.csv", as_attachment=True)
+
+    return send_file(
+        output,
+        mimetype="text/csv",
+        download_name="weekly_report.csv",
+        as_attachment=True,
+    )
 
 
 # -------------------------
@@ -384,7 +486,8 @@ def weekly_report():
 # -------------------------
 if __name__ == "__main__":
     os.makedirs(os.path.join(BASE_DIR, "instance"), exist_ok=True)
+
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=5001)
 
+    app.run(debug=True, port=5001)

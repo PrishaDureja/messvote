@@ -9,7 +9,7 @@ STOPWORDS = {
 
 def normalize_text(text: str) -> str:
     """
-    Normalize raw feedback text for NLP and ML pipelines.
+    Normalize raw feedback text for NLP.
 
     Steps:
     1. Convert text to lowercase

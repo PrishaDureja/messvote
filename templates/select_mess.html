@@ -11,7 +11,7 @@
   {% include '_navbar.html' %}
   <div class="container center">
     <h2>Welcome to {{ mess }}</h2>
-    <a href="{{ url_for('login', mess=mess|lower|replace(' ', '')) }}" class="btn">
+    <a href="{{ url_for('login', mess=mess) }}" class="btn">
     Login to Continue
 </a>
 
