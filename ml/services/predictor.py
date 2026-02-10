@@ -1,34 +1,61 @@
-from ml.models.complaint_classifier import ComplaintClassifier
-
-# Load model once
-_classifier = ComplaintClassifier()
-
-# Temporary training data (will be replaced later)
-TRAIN_TEXTS = [
-    "Food was very oily and tasted bad",
-    "Plates were dirty and hygiene was poor",
-    "Quantity of food was very less",
-    "Dinner was served too late",
-    "Menu has very little variety"
-]
-
-TRAIN_LABELS = [
-    "taste",
-    "hygiene",
-    "quantity",
-    "timing",
-    "variety"
-]
-
-_classifier.train(TRAIN_TEXTS, TRAIN_LABELS)
-
-
-def predict_aspect(feedback_text: str) -> str:
+def predict_aspect(text: str) -> str:
     """
-    Predict complaint aspect from feedback text.
-    """
-    if not feedback_text:
-        return None
+    Rule-based aspect prediction for mess feedback.
 
-    prediction = _classifier.predict([feedback_text])
-    return prediction[0]
+    Aspects:
+    - taste
+    - hygiene
+    - quantity
+    - timing
+    - variety
+    """
+
+    if not text:
+        return "unknown"
+
+    text = text.lower()
+
+    taste_keywords = [
+        "salty", "sweet", "spicy", "oily", "bland",
+        "taste", "flavor", "flavour", "overcooked", "undercooked"
+    ]
+
+    hygiene_keywords = [
+        "dirty", "unclean", "plates", "spoon", "hygiene",
+        "smell", "odor", "odour", "insects"
+    ]
+
+    quantity_keywords = [
+        "less quantity", "very less", "not enough",
+        "small portion", "insufficient", "quantity"
+    ]
+
+    timing_keywords = [
+        "late", "delay", "timing", "slow", "early"
+    ]
+
+    variety_keywords = [
+        "same food", "repetitive", "no variety", "boring"
+    ]
+
+    for word in taste_keywords:
+        if word in text:
+            return "taste"
+
+    for word in hygiene_keywords:
+        if word in text:
+            return "hygiene"
+
+    for word in quantity_keywords:
+        if word in text:
+            return "quantity"
+
+    for word in timing_keywords:
+        if word in text:
+            return "timing"
+
+    for word in variety_keywords:
+        if word in text:
+            return "variety"
+
+    return "other"
