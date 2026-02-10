@@ -60,6 +60,9 @@ class Vote(db.Model):
     item_name = db.Column(db.String(200), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
     feedback = db.Column(db.String(1000))
+
+    predicted_aspect = db.Column(db.String(50))
+
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
@@ -430,6 +433,61 @@ def admin_export():
 @app.route("/choose_login/<mess>")
 def choose_login(mess):
     return render_template("choose_login.html", mess=mess)
+
+@app.route("/admin/aspect_summary")
+@admin_required
+def admin_aspect_summary():
+    """
+    Shows aspect-wise complaint percentages + student summary
+    """
+
+    # Fetch aspect counts
+    aspect_rows = (
+        db.session.query(
+            Vote.predicted_aspect,
+            func.count(Vote.id).label("count")
+        )
+        .filter(Vote.predicted_aspect.isnot(None))
+        .group_by(Vote.predicted_aspect)
+        .order_by(func.count(Vote.id).desc())
+        .all()
+    )
+
+    if not aspect_rows:
+        return render_template(
+            "admin_aspect_summary.html",
+            aspect_data=None,
+            student_summary=None
+        )
+
+    total = sum(row.count for row in aspect_rows)
+
+    # Build aspect data with percentage
+    aspect_data = []
+    for aspect, count in aspect_rows:
+        percentage = round((count / total) * 100, 1)
+        aspect_data.append({
+            "aspect": aspect,
+            "count": count,
+            "percentage": percentage
+        })
+
+    #  Rule-based “Students Say” summary
+    top = aspect_data[0]
+    student_summary = (
+        f"Most students are complaining about {top['aspect']}. "
+        f"It accounts for nearly {top['percentage']}% of all feedback, "
+        f"indicating a major issue that needs immediate attention."
+    )
+
+    return render_template(
+        "admin_aspect_summary.html",
+        aspect_data=aspect_data,
+        student_summary=student_summary
+    )
+
+
+
 
 
 @app.route("/admin/weekly_report")
