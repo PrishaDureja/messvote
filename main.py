@@ -2,6 +2,9 @@ import os
 import csv
 import io
 from datetime import datetime, date, timedelta
+from ml.services.predictor import predict_aspect, predict_sentiment
+
+
 
 from flask import (
     Flask,
@@ -15,8 +18,6 @@ from flask import (
 )
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
-
-from ml.services.predictor import predict_aspect
 
 
 # -------------------------
@@ -62,7 +63,7 @@ class Vote(db.Model):
     feedback = db.Column(db.String(1000))
 
     predicted_aspect = db.Column(db.String(50))
-
+    predicted_sentiment = db.Column(db.String(20))
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
@@ -204,8 +205,11 @@ def menu(meal_type):
                     )
                     db.session.add(vote)
 
-                    predicted = predict_aspect(feedback_text)
-                    vote.predicted_aspect = predicted
+                    predicted_aspect = predict_aspect(feedback_text)
+                    vote.predicted_aspect = predicted_aspect
+                    predicted_sentiment = predict_sentiment(feedback_text)
+                    vote.predicted_sentiment = predicted_sentiment
+
 
         suggestion_text = request.form.get("suggestion_text", "").strip()
         if suggestion_text:
@@ -438,51 +442,105 @@ def choose_login(mess):
 @admin_required
 def admin_aspect_summary():
     """
-    Shows aspect-wise complaint percentages + student summary
+    Aspect-wise complaint breakdown with sentiment distribution.
     """
 
-    # Fetch aspect counts
-    aspect_rows = (
-        db.session.query(
-            Vote.predicted_aspect,
-            func.count(Vote.id).label("count")
-        )
-        .filter(Vote.predicted_aspect.isnot(None))
-        .group_by(Vote.predicted_aspect)
-        .order_by(func.count(Vote.id).desc())
-        .all()
-    )
+    votes = Vote.query.filter(
+        Vote.predicted_aspect.isnot(None)
+    ).all()
 
-    if not aspect_rows:
+    if not votes:
         return render_template(
             "admin_aspect_summary.html",
             aspect_data=None,
-            student_summary=None
+            student_summary=None,
+            sentiment_data=None
         )
 
-    total = sum(row.count for row in aspect_rows)
+    # -----------------------------------
+    # STEP 1: Build stats dictionary
+    # -----------------------------------
+    aspect_stats = {}
 
-    # Build aspect data with percentage
+    for vote in votes:
+        aspect = vote.predicted_aspect
+        sentiment = vote.predicted_sentiment or "neutral"
+
+        if aspect not in aspect_stats:
+            aspect_stats[aspect] = {
+                "total": 0,
+                "positive": 0,
+                "neutral": 0,
+                "negative": 0
+            }
+
+        aspect_stats[aspect]["total"] += 1
+
+        if sentiment in ["positive", "neutral", "negative"]:
+            aspect_stats[aspect][sentiment] += 1
+
+    # -----------------------------------
+    # STEP 2: Calculate percentages
+    # -----------------------------------
+    grand_total = sum(data["total"] for data in aspect_stats.values())
+
     aspect_data = []
-    for aspect, count in aspect_rows:
-        percentage = round((count / total) * 100, 1)
+    sentiment_data = {}
+
+    for aspect, data in aspect_stats.items():
+        percentage = round((data["total"] / grand_total) * 100, 1)
+
         aspect_data.append({
             "aspect": aspect,
-            "count": count,
-            "percentage": percentage
+            "total": data["total"],
+            "percentage": percentage,
         })
 
-    #  Rule-based “Students Say” summary
-    top = aspect_data[0]
+        total_aspect = data["total"]
+
+        sentiment_data[aspect] = {
+            "positive": round((data["positive"] / total_aspect) * 100, 1) if total_aspect else 0,
+            "neutral": round((data["neutral"] / total_aspect) * 100, 1) if total_aspect else 0,
+            "negative": round((data["negative"] / total_aspect) * 100, 1) if total_aspect else 0,
+        }
+
+    # Sort by highest complaint %
+    aspect_data.sort(key=lambda x: x["percentage"], reverse=True)
+
+    # -----------------------------------
+    # STEP 3: Intelligent Summary
+    # -----------------------------------
+    filtered = [a for a in aspect_data if a["aspect"] != "other"]
+
+    if filtered:
+        top = filtered[0]
+    else:
+        top = aspect_data[0]
+
+    top_sentiments = sentiment_data[top["aspect"]]
+
+    negative_percent = top_sentiments["negative"]
+    positive_percent = top_sentiments["positive"]
+
+    if negative_percent >= 60:
+        severity = "⚠️ Critical issue — Immediate action required."
+    elif negative_percent >= 40:
+        severity = "⚡ Moderate concern — Needs monitoring."
+    elif positive_percent > negative_percent:
+        severity = "✅ Under control — Mostly positive feedback."
+    else:
+        severity = "Mixed feedback — Requires observation."
+
     student_summary = (
-        f"Most students are complaining about {top['aspect']}. "
-        f"It accounts for nearly {top['percentage']}% of all feedback, "
-        f"indicating a major issue that needs immediate attention."
+        f"The biggest issue right now is {top['aspect']}. "
+        f"It represents {top['percentage']}% of all complaints. "
+        f"{severity}"
     )
 
     return render_template(
         "admin_aspect_summary.html",
         aspect_data=aspect_data,
+        sentiment_data=sentiment_data,
         student_summary=student_summary
     )
 

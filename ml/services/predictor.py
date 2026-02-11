@@ -1,3 +1,7 @@
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+analyzer = SentimentIntensityAnalyzer()
+
 def predict_aspect(text: str) -> str:
     """
     Rule-based aspect prediction for mess feedback.
@@ -59,3 +63,22 @@ def predict_aspect(text: str) -> str:
             return "variety"
 
     return "other"
+
+def predict_sentiment(feedback_text: str) -> str:
+    """
+    Sentiment detection using VADER.
+    """
+
+    if not feedback_text:
+        return None
+
+    scores = analyzer.polarity_scores(feedback_text)
+
+    compound = scores["compound"]
+
+    if compound >= 0.05:
+        return "positive"
+    elif compound <= -0.05:
+        return "negative"
+    else:
+        return "neutral"
