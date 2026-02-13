@@ -34,9 +34,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
+
 
 
 
@@ -82,6 +80,9 @@ class Suggestion(db.Model):
     date = db.Column(db.DateTime, default=datetime.utcnow)
     reviewed = db.Column(db.Boolean, default=False)
 
+# Create tables on startup (for Render)
+with app.app_context():
+    db.create_all()
 
 # -------------------------
 # Helper
