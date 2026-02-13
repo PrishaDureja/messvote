@@ -1,5 +1,5 @@
 /* =====================================
-   MessVote — GlassGlow Final Theme (Updated Logic)
+   MessVote â€” GlassGlow Final Theme (Updated Logic)
    ===================================== */
 
 /* --- Core Variables --- */
@@ -27,78 +27,144 @@ body {
   overflow-x: hidden;
 }
 
-/* --- Overlay --- */
-.overlay {
-  backdrop-filter: blur(3px);
-  background-color: rgba(255, 255, 255, 0.05);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
 
-/* --- Navbar --- */
+
+
+/* =====================================
+   HEADER — CENTER LOGO LAYOUT
+===================================== */
+
 .navbar {
   position: fixed;
   top: 0;
   width: 100%;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 70px;
-  z-index: 100;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  height: 70px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
 }
 
-.navbar .logo {
-  font-weight: 700;
-  font-size: 1.7rem;
-  color: #0f1b2d;
-  letter-spacing: 0.5px;
+/* Left & Right containers */
+.nav-left,
+.nav-right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
+.nav-left {
+  left: 60px;
+}
+
+.nav-right {
+  right: 60px;
+}
+
+/* Center Logo */
+.nav-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Links */
 .navbar a {
-  color: #0f1b2d;
-  font-weight: 600;
   text-decoration: none;
-  margin-left: 28px;
-  transition: 0.3s ease;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #1e2d45;
+  transition: 0.2s ease;
 }
 
 .navbar a:hover {
   color: var(--btn-color);
-  text-shadow: 0 0 10px rgba(162, 210, 255, 0.8);
 }
+
+/* Logo Styling */
+.logo-link {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+
+
+
+/* =====================================
+   FOOTER — SAME HEIGHT AS HEADER
+===================================== */
+
+.footer {
+  width: 100%;
+  height: 70px;                 /* Same as navbar */
+  background: #ffffff;          /* FULLY OPAQUE */
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;          /* Vertical center */
+}
+
+.footer-content {
+  width: 90%;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #1e2d45;
+}
+
+/* Compact text */
+.footer h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.footer-links a {
+  margin-left: 18px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1e2d45;
+  transition: 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--btn-color);
+}
+
+/* REMOVE old large spacing */
+.footer-bottom {
+  display: none;
+}
+
+
 
 /* --- Card Containers --- */
 .choose-card,
 .login-card,
 .admin-card,
-.login-choice-card {
-  background: rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(16px);
+.login-choice-card{
+  background: rgba(255, 255, 255, 0.55);   /* less transparent */
+  backdrop-filter: blur(12px);
   border-radius: 26px;
   padding: 50px 55px;
   width: 500px;
-  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  animation: fadeInUp 0.6s ease forwards;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);  /* softer shadow */
   text-align: center;
   margin-top: 90px;
 }
 
-.choose-card:hover,
-.login-card:hover,
-.admin-card:hover,
-.login-choice-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 50px rgba(162, 210, 255, 0.5);
-}
+
 
 /* --- Headings --- */
 .main-heading {
@@ -427,4 +493,128 @@ tbody tr:nth-child(even) {
   height: 100%;
   background: #2ecc71;
   float: left;
+}
+
+
+
+
+
+
+
+
+/* =====================================
+   GLOBAL PAGE LAYOUT FIX
+===================================== */
+
+
+
+
+/* =====================================
+   GLOBAL PAGE LAYOUT FIX (FINAL)
+===================================== */
+
+/* Full height layout */
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Content area between header & footer */
+.page-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 70px; /* exact navbar height */
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+
+/* Ensure cards stay centered */
+.choose-card,
+.login-card,
+.admin-card,
+.login-choice-card {
+  margin: 0;   /* REMOVE margin-top: 90px */
+}
+
+
+
+/* Center container */
+.center-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background-image: url("../images/bg_home.png");
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================
+   ADMIN FORM READABILITY IMPROVEMENT
+===================================== */
+
+/* Form labels */
+.choose-card label {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--main-heading);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Dropdown styling */
+.choose-card select {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(255,255,255,0.9);
+  color: #1e2d45;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.choose-card select:focus {
+  outline: none;
+  border-color: var(--btn-color);
+  box-shadow: 0 0 8px rgba(162, 210, 255, 0.6);
+}
+
+/* Text inputs inside admin card */
+.choose-card input[type="text"] {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 10px 14px;
+}
+
+/* Table header more readable */
+.choose-card table th {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Table body */
+.choose-card table td {
+  font-size: 0.95rem;
 }

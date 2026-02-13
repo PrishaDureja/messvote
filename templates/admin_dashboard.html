@@ -7,25 +7,31 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="login-page">
-  {% include '_navbar.html' %}
-  <div class="overlay">
+<body>
+
+  {% include '_header.html' %}
+
+  <div class="page-wrapper">
     <div class="choose-card" style="width: 950px;">
       <h1 class="main-heading">Admin Dashboard</h1>
       <h2 class="sub-heading">Meal Performance and Ratings Overview</h2>
+
+      <!-- Weekly Trend -->
+      <h3 style="margin-top:40px;">Weekly Rating Trend</h3>
+      <canvas id="weeklyTrendChart" height="160"></canvas>
 
       {% if meal_averages %}
         <h3 style="color: var(--main-heading); margin-top: 25px;">
           Average Ratings by Meal
         </h3>
-        <canvas id="mealChart" style="margin-top: 15px;"></canvas>
+        <canvas id="mealChart" height="150"></canvas>
       {% endif %}
 
       {% if dish_averages %}
         <h3 style="color: var(--main-heading); margin-top: 35px;">
           Top Rated Dishes
         </h3>
-        <canvas id="dishChart" style="margin-top: 15px;"></canvas>
+        <canvas id="dishChart" height="170"></canvas>
       {% endif %}
 
       {% if star_meal %}
@@ -40,14 +46,13 @@
         <a href="{{ url_for('admin_export') }}" class="btn">Export Ratings</a>
         <a href="{{ url_for('weekly_report') }}" class="btn">Weekly Report</a>
         <a href="{{ url_for('admin_aspect_summary') }}" class="btn">
-          📊 Aspect-wise Complaints
+          Aspect-wise Complaints
         </a>
       </div>
-
     </div>
   </div>
 
-  <!-- Store Flask data in hidden JSON blocks to avoid parser errors -->
+  <!-- Safe JSON Storage -->
   <script id="meal-data" type="application/json">
     {{ meal_averages | tojson }}
   </script>
@@ -57,7 +62,6 @@
   </script>
 
   <script>
-    // Parse Flask data safely
     const mealData = JSON.parse(document.getElementById('meal-data').textContent || '[]');
     const dishData = JSON.parse(document.getElementById('dish-data').textContent || '[]');
 
@@ -67,70 +71,77 @@
     const dishRatings = dishData.map(item => item[1]);
 
     const pastelColors = ["#F6C3A0", "#BD725D", "#FFD8B1", "#B4C5E4", "#F7B7A3", "#A2D2FF"];
+    const chartTextColor = "#1f2937";
+    const gridColor = "rgba(0,0,0,0.08)";
 
-    // Chart 1: Average Ratings by Meal
+    const trendLabels = {{ trend_labels | tojson }};
+    const trendValues = {{ trend_values | tojson }};
+
+    if (trendLabels.length > 0) {
+      new Chart(document.getElementById('weeklyTrendChart'), {
+        type: 'line',
+        data: {
+          labels: trendLabels,
+          datasets: [{
+            label: 'Average Rating',
+            data: trendValues,
+            borderColor: '#2ecc71',
+            backgroundColor: 'rgba(46, 204, 113, 0.2)',
+            tension: 0.3,
+            fill: true,
+            pointRadius: 5
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+    }
+
     if (mealLabels.length > 0) {
-      const ctx = document.getElementById('mealChart');
-      new Chart(ctx, {
+      new Chart(document.getElementById('mealChart'), {
         type: 'bar',
         data: {
           labels: mealLabels,
           datasets: [{
-            label: 'Average Rating',
             data: mealRatings,
             backgroundColor: pastelColors,
-            borderRadius: 8
+            borderRadius: 10
           }]
         },
         options: {
           responsive: true,
+          plugins: { legend: { display: false } },
           scales: {
-            y: { beginAtZero: true, ticks: { color: '#555', stepSize: 0.5 } },
-            x: { ticks: { color: '#555' } }
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#FFF8F2',
-              titleColor: '#333',
-              bodyColor: '#555'
-            }
+            y: { beginAtZero: true, max: 5 }
           }
         }
       });
     }
 
-    // Chart 2: Top Rated Dishes
     if (dishLabels.length > 0) {
-      const ctx = document.getElementById('dishChart');
-      new Chart(ctx, {
+      new Chart(document.getElementById('dishChart'), {
         type: 'bar',
         data: {
           labels: dishLabels.slice(0, 7),
           datasets: [{
-            label: 'Average Rating',
             data: dishRatings.slice(0, 7),
             backgroundColor: pastelColors,
-            borderRadius: 8
+            borderRadius: 10
           }]
         },
         options: {
           responsive: true,
+          plugins: { legend: { display: false } },
           scales: {
-            y: { beginAtZero: true, ticks: { color: '#555', stepSize: 0.5 } },
-            x: { ticks: { color: '#555' } }
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#FFF8F2',
-              titleColor: '#333',
-              bodyColor: '#555'
-            }
+            y: { beginAtZero: true, max: 5 }
           }
         }
       });
     }
   </script>
+
+  {% include '_footer.html' %}
+
 </body>
 </html>

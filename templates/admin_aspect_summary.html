@@ -7,11 +7,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body class="login-page">
+<body>
 
-    {% include "_navbar.html" %}
+    {% include '_header.html' %}
 
-    <div class="overlay">
+    <!-- ✅ PAGE WRAPPER (THIS FIXES CENTERING) -->
+    <div class="page-wrapper">
         <div class="choose-card" style="width:650px">
 
             <h1 class="main-heading">
@@ -120,6 +121,8 @@
 
         </div>
     </div>
+
+    {% include '_footer.html' %}
 
 </body>
 

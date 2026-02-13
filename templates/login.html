@@ -4,29 +4,50 @@
   <meta charset="UTF-8">
   <title>Login — Mess Vote</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Red+Hat+Display:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body class="login-page">
-  <div class="overlay">
-    <div class="login-card">
-      
-      <h1 class="main-heading">Welcome to Mess Vote</h1>
-      <p class="sub-heading">Login to {{ mess or request.args.get('mess') }} Mess</p>
+<body>
 
-      <!-- Login Form -->
+  {% include '_header.html' %}
+
+  <div class="page-wrapper">
+    <div class="login-card">
+
+      <h1 class="main-heading">Welcome to Mess Vote</h1>
+      <p class="sub-heading">
+        Login to {{ mess or request.args.get('mess') }} Mess
+      </p>
+
       <form method="POST" action="{{ url_for('login') }}">
         <input type="hidden" name="mess" value="{{ mess or request.args.get('mess') }}">
 
-        <label for="reg_no" class="form-label">Enter Registration Number</label>
-        <input type="text" id="reg_no" name="reg_no" placeholder="e.g. 23BDS1010" required>
+        <label for="reg_no" class="form-label">
+          Enter Registration Number
+        </label>
+
+        <input
+          type="text"
+          id="reg_no"
+          name="reg_no"
+          placeholder="e.g. 23BDS1010"
+          required
+        >
 
         <button type="submit" class="btn">Continue</button>
       </form>
 
-      <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
+      <a href="{{ url_for('index') }}" class="back-link">
+        ← Back to Home
+      </a>
+
     </div>
   </div>
+
+  {% include '_footer.html' %}
+
 </body>
+
 </html>

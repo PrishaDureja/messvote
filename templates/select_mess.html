@@ -2,19 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ mess }} - Login</title>
+  <title>Select Mess</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-
 <body>
-  {% include '_navbar.html' %}
-  <div class="container center">
-    <h2>Welcome to {{ mess }}</h2>
-    <a href="{{ url_for('login', mess=mess) }}" class="btn">
-    Login to Continue
-</a>
+  {% include '_header.html' %}
 
+  <div class="page-wrapper">
+    <div class="center-box">
+      <div class="choose-card">
+
+        <h2 class="main-heading">Welcome to {{ mess }}</h2>
+
+        <a href="{{ url_for('login', mess=mess) }}" class="btn">
+          Login to Continue
+        </a>
+
+      </div>
+    </div>
   </div>
+
+  {% include '_footer.html' %}
 </body>
 </html>

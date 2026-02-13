@@ -132,7 +132,7 @@ def index():
 @app.route("/select_mess")
 def select_mess():
     mess = request.args.get("mess")
-    return render_template("select_mess.html", mess=mess)
+    return render_template("select_mess.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -351,6 +351,9 @@ def admin_suggestions():
 @app.route("/admin/dashboard")
 @admin_required
 def admin_dashboard():
+    # -----------------------------------
+    # Meal Averages
+    # -----------------------------------
     meal_averages_query = (
         db.session.query(
             Vote.meal_type,
@@ -365,6 +368,9 @@ def admin_dashboard():
         for m in meal_averages_query
     ]
 
+    # -----------------------------------
+    # Dish Averages
+    # -----------------------------------
     dish_averages_query = (
         db.session.query(
             Vote.item_name,
@@ -382,12 +388,42 @@ def admin_dashboard():
 
     star_meal = dish_averages[0][0] if dish_averages else None
 
+    # -----------------------------------
+    # Weekly Trend (Last 7 Days)
+    # -----------------------------------
+    today_date = date.today()
+    week_ago = today_date - timedelta(days=7)
+
+    daily_trend_query = (
+        db.session.query(
+            func.date(Vote.date),
+            func.avg(Vote.rating)
+        )
+        .filter(Vote.date >= week_ago)
+        .group_by(func.date(Vote.date))
+        .order_by(func.date(Vote.date))
+        .all()
+    )
+
+    trend_labels = []
+    trend_values = []
+
+    for d, avg in daily_trend_query:
+        trend_labels.append(str(d))
+        trend_values.append(round(avg, 2))
+
+    # -----------------------------------
+    # RETURN TEMPLATE (THIS WAS MISSING)
+    # -----------------------------------
     return render_template(
         "admin_dashboard.html",
         meal_averages=meal_averages,
         dish_averages=dish_averages,
         star_meal=star_meal,
+        trend_labels=trend_labels,
+        trend_values=trend_values,
     )
+
 
 
 @app.route("/admin/export")

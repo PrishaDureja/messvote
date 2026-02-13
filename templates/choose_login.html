@@ -7,8 +7,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
-  <div class="overlay">
+
+  {% include '_header.html' %}
+
+  <div class="page-wrapper">
     <div class="login-choice-card">
       <h1 class="main-heading">Login to {{ mess }} Mess</h1>
       <p class="sub-heading">Select your role</p>
@@ -16,11 +20,13 @@
       <div class="choice-buttons">
         <a href="{{ url_for('login', mess=mess) }}" class="btn">Student Login</a>
         <a href="{{ url_for('admin_login', mess=mess) }}" class="btn">Admin Login</a>
-
       </div>
 
       <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
     </div>
   </div>
+
+  {% include '_footer.html' %}
+
 </body>
 </html>

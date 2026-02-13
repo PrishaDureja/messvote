@@ -8,27 +8,40 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <script src="https://kit.fontawesome.com/a2e0e6f4a4.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
-  <div class="overlay">
+
+  {% include '_header.html' %}
+
+  <div class="page-wrapper">
     <div class="choose-card">
+
       <h1 class="main-heading">{{ mess }} Mess</h1>
       <p class="sub-heading">Select a meal to rate today</p>
 
       <div class="meal-buttons">
-  <a href="{{ url_for('menu', meal_type='breakfast') }}" class="meal-btn">
-    <i class="fa-solid fa-mug-hot"></i> Breakfast
-  </a>
-  <a href="{{ url_for('menu', meal_type='lunch') }}" class="meal-btn">
-    <i class="fa-solid fa-utensils"></i> Lunch
-  </a>
-  <a href="{{ url_for('menu', meal_type='dinner') }}" class="meal-btn">
-    <i class="fa-solid fa-moon"></i> Dinner
-  </a>
-</div>
+        <a href="{{ url_for('menu', meal_type='breakfast') }}" class="meal-btn">
+          <i class="fa-solid fa-mug-hot"></i> Breakfast
+        </a>
 
+        <a href="{{ url_for('menu', meal_type='lunch') }}" class="meal-btn">
+          <i class="fa-solid fa-utensils"></i> Lunch
+        </a>
 
-      <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        <a href="{{ url_for('menu', meal_type='dinner') }}" class="meal-btn">
+          <i class="fa-solid fa-moon"></i> Dinner
+        </a>
+      </div>
+
+      <!-- Make logout consistent -->
+      <a href="{{ url_for('logout') }}" class="btn" style="margin-top:30px;">
+        Logout
+      </a>
+
     </div>
   </div>
+
+  {% include '_footer.html' %}
+
 </body>
 </html>

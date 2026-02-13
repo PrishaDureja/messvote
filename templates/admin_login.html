@@ -6,9 +6,11 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
+<body>
 
-<body class="login-page">
-  <div class="overlay">
+  {% include '_header.html' %}
+
+  <div class="page-wrapper">
     <div class="login-card">
       <h1 class="main-heading">Welcome Back Admin</h1>
       <h2 class="sub-heading">Login to Manage Menus & Feedback</h2>
@@ -23,8 +25,13 @@
         <button type="submit" class="btn">Continue</button>
       </form>
 
-      <a href="{{ url_for('index') }}" class="back-btn">← Back to Home</a>
+      <a href="{{ url_for('index') }}" class="back-link">
+        ← Back to Home
+      </a>
     </div>
   </div>
+
+  {% include '_footer.html' %}
+
 </body>
 </html>
