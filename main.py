@@ -2,9 +2,6 @@ import os
 import csv
 import io
 from datetime import datetime, date, timedelta
-from ml.services.predictor import predict_aspect, predict_sentiment
-
-
 
 from flask import (
     Flask,
@@ -19,21 +16,31 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
+from ml.services.predictor import predict_aspect, predict_sentiment
+
 
 # -------------------------
 # Basic Setup
 # -------------------------
 BASE_DIR = os.path.dirname(__file__)
-DB_PATH = os.path.join(BASE_DIR, "instance", "database.db")
+DB_FOLDER = os.path.join(BASE_DIR, "instance")
+DB_PATH = os.path.join(DB_FOLDER, "database.db")
+
+# Ensure instance folder exists
+os.makedirs(DB_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev_key")
-
 
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
+# Create tables automatically (for Render)
+with app.app_context():
+    db.create_all()
+
 
 
 # -------------------------
@@ -638,9 +645,5 @@ def weekly_report():
 # Run App
 # -------------------------
 if __name__ == "__main__":
-    os.makedirs(os.path.join(BASE_DIR, "instance"), exist_ok=True)
+    app.run(debug=True, port=5001)
 
-    with app.app_context():
-        db.create_all()
-
-    app.run(debug=True)
