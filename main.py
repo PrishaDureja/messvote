@@ -22,17 +22,29 @@ from ml.services.predictor import predict_aspect, predict_sentiment
 # -------------------------
 # Basic Setup
 # -------------------------
-BASE_DIR = os.path.dirname(__file__)
-
-DB_PATH = "/tmp/database.db"
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev_key")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
+database_url = os.environ.get("DATABASE_URL")
+
+# Fix for Render postgres URL format
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+if database_url:
+    # Production (Render)
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+else:
+    # Local development
+    BASE_DIR = os.path.dirname(__file__)
+    db_path = os.path.join(BASE_DIR, "local.db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
 
 
 
@@ -646,4 +658,3 @@ def weekly_report():
 # -------------------------
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
-
