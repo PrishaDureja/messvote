@@ -23,11 +23,8 @@ from ml.services.predictor import predict_aspect, predict_sentiment
 # Basic Setup
 # -------------------------
 BASE_DIR = os.path.dirname(__file__)
-DB_FOLDER = os.path.join(BASE_DIR, "instance")
-DB_PATH = os.path.join(DB_FOLDER, "database.db")
 
-# Ensure instance folder exists
-os.makedirs(DB_FOLDER, exist_ok=True)
+DB_PATH = "/tmp/database.db"
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev_key")
@@ -37,9 +34,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# Create tables automatically (for Render)
 with app.app_context():
     db.create_all()
+
 
 
 
