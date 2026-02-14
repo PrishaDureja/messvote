@@ -412,7 +412,7 @@ def admin_dashboard():
     # Weekly Trend (Last 7 Days)
     # -----------------------------------
     today_date = date.today()
-    week_ago = today_date - timedelta(days=7)
+    week_ago = today_date - timedelta(days=30)
 
     daily_trend_query = (
         db.session.query(
