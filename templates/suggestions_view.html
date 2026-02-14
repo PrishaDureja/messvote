@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin — Suggestions | Mess Vote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
     body {
@@ -14,12 +15,13 @@
   </style>
 </head>
 
+<body>
 
-<body class="login-page">
   {% include '_header.html' %}
 
-  <div class="overlay">
+  <div class="page-wrapper">
     <div class="choose-card" style="width: 850px;">
+
       <h1 class="main-heading">💬 Student Suggestions</h1>
       <h2 class="sub-heading">Feedback shared by students</h2>
 
@@ -52,10 +54,13 @@
       <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
         <a href="{{ url_for('admin_menus') }}" class="btn">⬅ Back to Menus</a>
         <a href="{{ url_for('admin_dashboard') }}" class="btn">📊 Dashboard</a>
-        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        <a href="{{ url_for('logout') }}" class="btn">Logout</a>
       </div>
+
     </div>
   </div>
-{% include '_footer.html' %}
+
+  {% include '_footer.html' %}
+
 </body>
 </html>
